@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+image_name=swift-test-web
+container_name=swift-test-web
+id=$(docker images | grep $image_name | head -1 | awk '{print $3}')
+docker build -t $image_name:latest .
+
+if [ -n "$id" ]; then
+  echo "Removing $id"
+  if docker ps -a | grep -q $container_name; then
+    docker rm -f $container_name
+  fi
+  docker rmi -f $id
+fi
+
+docker run -it --name $container_name -P $image_name
+docker logs $container_name
